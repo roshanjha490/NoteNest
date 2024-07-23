@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "message": "Directory Content received",
+  "response": [
+    {
+      "name": "adas",
+      "isDirectory": true,
+      "children": [
+        {
+          "name": "hfghfgh",
+          "isDirectory": true,
+          "children": [
+            { "name": "dont.md", "isDirectory": false, "children": [] }
+          ]
+        },
+        { "name": "readme.md", "isDirectory": false, "children": [] }
+      ]
+    },
+    { "name": "research-page.md", "isDirectory": false, "children": [] }
+  ]
+}

@@ -1,14 +1,19 @@
 "use client"
 import React from 'react'
 
+import dynamic from 'next/dynamic';
 
-import { Controlled as CodeMirror } from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
-// import 'codemirror/theme/material.css';
-import 'codemirror/theme/base16-light.css';
-import 'codemirror/mode/gfm/gfm.js'
-import 'codemirror/addon/selection/active-line'
-import 'codemirror/addon/scroll/scrollpastend'
+// import { Controlled as CodeMirror } from 'react-codemirror2';
+
+// Dynamically import CodeMirror on the client side
+const CodeMirror = dynamic(() => import('react-codemirror2').then(mod => mod.Controlled), { ssr: false });
+
+// import 'codemirror/lib/codemirror.css';
+// // import 'codemirror/theme/material.css';
+// import 'codemirror/theme/base16-light.css';
+// import 'codemirror/mode/gfm/gfm.js'
+// import 'codemirror/addon/selection/active-line'
+// import 'codemirror/addon/scroll/scrollpastend'
 
 
 import { createFile, get_filecontent } from '@/app/actions';
@@ -25,8 +30,19 @@ const NoteEditor = () => {
 
     const editorWillUnmount = () => {
         editor.current.display.wrapper.remove()
-        wrapper.current.hydrated = false
+        // wrapper.current.hydrated = false
     }
+
+    useEffect(() => {
+        // Import CodeMirror CSS only on the client side
+        if (typeof window !== 'undefined') {
+            require('codemirror/lib/codemirror.css');
+            require('codemirror/theme/base16-light.css');
+            require('codemirror/mode/gfm/gfm.js');
+            require('codemirror/addon/selection/active-line');
+            require('codemirror/addon/scroll/scrollpastend');
+        }
+    }, []);
 
     // const onNewLine = (e) => {
     //     console.log(e);
@@ -35,41 +51,29 @@ const NoteEditor = () => {
     // }
 
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        const fetchNotes = async () => {
+    //     const fetchNotes = async () => {
 
-            const result = await get_filecontent()
+    //         const result = await get_filecontent()
 
-            if (result.success) {
-                setValue(result.response)
-            } else {
-                toast.error('Failed')
-            }
+    //         if (result.success) {
+    //             setValue(result.response)
+    //         } else {
+    //             toast.error('Failed')
+    //         }
 
-        }
+    //     }
 
-        fetchNotes()
+    //     fetchNotes()
 
-    }, [])
+    // }, [])
 
 
-
-    const createFileBtn = async () => {
-        const result = await createFile(value)
-
-        console.log(result)
-
-        if (result.success) {
-            toast.success(result.message)
-        } else {
-            toast.error(result.message)
-        }
-    }
 
     return (
         <>
-            <div className='w-[700px] h-500px bg-red-400'>
+            <div className='w-full h-full overflow-y-scroll'>
                 <CodeMirror
                     data-testid="codemirror-editor"
                     className="editor mousetrap"
@@ -112,7 +116,6 @@ const NoteEditor = () => {
 
             </div>
 
-            <button onClick={() => createFileBtn()} type="button" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Create New File</button>
         </>
     )
 

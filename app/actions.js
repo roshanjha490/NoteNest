@@ -108,16 +108,25 @@ export async function get_filecontent() {
 
 }
 
-
-
 async function getDirectoryContent(directoryPath) {
     const items = await fs.readdir(directoryPath, { withFileTypes: true });
+
+    items.sort((a, b) => {
+        if (a.isDirectory() && !b.isDirectory()) {
+            return -1;
+        }
+        if (!a.isDirectory() && b.isDirectory()) {
+            return 1;
+        }
+        return a.name.localeCompare(b.name);
+    });
 
     const filesAndFolders = await Promise.all(items.map(async item => {
         const itemPath = path.join(directoryPath, item.name);
         const isDirectory = item.isDirectory();
         return {
             name: item.name,
+            path: itemPath,
             isDirectory,
             children: isDirectory ? await getDirectoryContent(itemPath) : []
         };
@@ -126,7 +135,6 @@ async function getDirectoryContent(directoryPath) {
     return filesAndFolders;
 }
 
-
 export async function get_all_files_n_directories() {
 
     const directoryPath = path.join(process.cwd(), 'Research Study');
@@ -134,11 +142,19 @@ export async function get_all_files_n_directories() {
     try {
         const filesAndFolders = await getDirectoryContent(directoryPath);
 
+        const res = {
+            name: 'Research Study',
+            path: directoryPath,
+            isDirectory: true,
+            children: filesAndFolders
+        };
+
         return {
             success: true,
             message: 'Directory Content received',
-            response: filesAndFolders
+            response: [res]
         };
+
     } catch (err) {
         console.error('Error reading directory:', err);
         return {
@@ -149,6 +165,114 @@ export async function get_all_files_n_directories() {
     }
 }
 
+export async function rename_item(formData) {
+
+    const { old_path_name, name } = formData;
+
+    // Get the directory of the old path
+    const directory = path.dirname(old_path_name);
+
+    // Construct the new path name
+    const new_path_name = path.join(directory, name);
+
+    try {
+        // Rename the item
+        await fs.rename(old_path_name, new_path_name);
+
+        return {
+            success: true,
+            message: 'Directory or file renamed successfully'
+        };
+
+    } catch (err) {
+        console.error('Error renaming directory or file:', err);
+
+        return {
+            success: false,
+            message: 'Error renaming directory or file',
+            error: err
+        };
+
+    }
+
+}
+
+export async function delete_item(formData) {
+
+    const { old_path_name } = formData;
+
+    try {
+        const stats = await fs.stat(old_path_name);
+
+        if (stats.isDirectory()) {
+            // Recursively delete the directory and its contents
+            await fs.rmdir(old_path_name, { recursive: true });
+        } else {
+            // Delete the file
+            await fs.unlink(old_path_name);
+        }
+
+        return {
+            success: true,
+            message: 'Item deleted successfully'
+        };
+    } catch (err) {
+        console.error('Error deleting item:', err);
+        return {
+            success: false,
+            message: 'Error deleting item',
+            error: err
+        };
+    }
+}
+
+
+export async function create_new_file(formData) {
+    const { old_path_name, name } = formData;
+    const newFilePath = path.join(old_path_name, name);
+
+    try {
+        // Create a new file with empty content
+        await fs.writeFile(newFilePath, '');
+
+        return {
+            success: true,
+            message: 'File created successfully',
+            filePath: newFilePath
+        };
+    } catch (err) {
+        console.error('Error creating file:', err);
+        return {
+            success: false,
+            message: 'Error creating file',
+            error: err
+        };
+    }
+}
+
+export async function create_new_folder(formData) {
+    const { old_path_name, name } = formData;
+    const newFolderPath = path.join(old_path_name, name);
+
+    try {
+        // Create a new folder
+        await fs.mkdir(newFolderPath, { recursive: true });
+
+        return {
+            success: true,
+            message: 'Folder created successfully',
+            folderPath: newFolderPath
+        };
+    } catch (err) {
+        console.error('Error creating folder:', err);
+        return {
+            success: false,
+            message: 'Error creating folder',
+            error: err
+        };
+    }
+
+}
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 

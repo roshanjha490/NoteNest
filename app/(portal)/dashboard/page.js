@@ -1,22 +1,313 @@
+"use client"
+
 import React from 'react'
+import Link from "next/link";
+import Image from 'next/image';
+import { useState, useRef, useEffect } from 'react';
+import { GiHamburgerMenu } from "react-icons/gi";
 import { signOut } from 'next-auth/react'
+import { FaTimes } from "react-icons/fa";
+
+import {
+    Cloud,
+    CreditCard,
+    Github,
+    Keyboard,
+    LifeBuoy,
+    LogOut,
+    Mail,
+    MessageSquare,
+    Plus,
+    PlusCircle,
+    Settings,
+    User,
+    UserPlus,
+    Users,
+} from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+
+import { FaUser } from "react-icons/fa";
+
+import { get_all_files_n_directories } from '@/app/actions';
+import FileExplorer from './FileExplorer';
+
+import Rename from './Rename';
 import NoteEditor from './NoteEditor';
-import { createFile } from '@/app/actions';
-import { toast } from 'react-hot-toast';
+
+const page = ({ children }) => {
+
+    const [navwidth, setnavwidth] = useState('240')
+    const [isDragging, setIsDragging] = useState(false);
+    const resizerRef = useRef(null);
+
+    const [checkChange, setcheckChange] = useState(true)
+
+    const [filesSystem, setfilesSystem] = useState([])
+
+    const [openFiles, setopenFiles] = useState([])
+
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+
+    const handleMouseMove = (e) => {
+        const newWidth = e.clientX;
+        if (newWidth > 150 && newWidth < 500) { // Set min and max constraints
+            setnavwidth(newWidth);
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    };
 
 
-export const metadata = {
-    title: "Dashboard | Research Study",
-    description: "",
-};
+    const fetchFilesDirectories = async () => {
+        const response = await get_all_files_n_directories();
+        console.log(openFiles)
+        if (response.success) {
+            setfilesSystem(response.response);
+        } else {
+            toast.error(response.message);
+        }
+    };
 
-const page = () => {
+    useEffect(() => {
+        fetchFilesDirectories();
+    }, []);
+
+
+    const openFileInEditor = async (item) => {
+        setopenFiles((prevOpenFiles) => {
+            // Create a new array with the previous items
+            let updatedOpenFiles = prevOpenFiles.map(file => ({
+                ...file,
+                isopen: false  // Set isopen to false for all previous items
+            }));
+
+            // Check if the item already exists in the array
+            const itemExists = updatedOpenFiles.some(file => file.id === item.id);
+
+            if (!itemExists) {
+                // If the item does not exist, add the new item
+                updatedOpenFiles.push(item);
+            } else {
+                // If the item already exists, set it to open
+                updatedOpenFiles = updatedOpenFiles.map(file =>
+                    file.id === item.id ? { ...file, isopen: true } : file
+                );
+            }
+
+            console.log('Updated Open Files:', updatedOpenFiles);
+
+            // Return the updated array
+            return updatedOpenFiles;
+        });
+    }
+
+    const selectFile = (selectedFile) => {
+        setopenFiles(openFiles.map(file => ({
+            ...file,
+            isopen: file === selectedFile
+        })));
+    };
+
+    const removeFile = (fileToRemove) => {
+        const updatedFiles = openFiles.filter(file => file !== fileToRemove);
+
+        // If the removed file was open, set the first file to be open
+        if (fileToRemove.isopen && updatedFiles.length > 0) {
+            updatedFiles[0].isopen = true;
+        }
+
+        // Set all other files' isopen to false
+        const finalFiles = updatedFiles.map(file => ({
+            ...file,
+            isopen: file.isopen || updatedFiles[0].isopen === file
+        }));
+
+        setopenFiles(finalFiles);
+    };
 
     return (
         <>
-        </>
-    );
+            <div className="w-full h-screen flex">
+                <div style={{ width: navwidth + 'px', backgroundColor: '#2d2d2d', position: 'relative' }} className="h-full flex overflow-hidden">
 
+                    <div className="w-[100%] h-full flex flex-col">
+
+                        <div className="w-full h-[10%] flex justify-center items-center border-b-2 border-blue-500">
+                            <div className="grid grid-cols-6">
+                                <div className="col-span-1 flex justify-center items-center">
+                                    <Image src='/img/logo.png' width={30} height={30} alt="Picture of the author"></Image>
+                                </div>
+                                <div className="col-span-5 flex justify-start items-center mx-[5px]">
+                                    <h1 className='text-white font-bold font-mono'>Research Study</h1>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div className="w-full flex-grow px-[5px] py-[10px]">
+                            <div className="w-full h-full">
+
+                                {filesSystem.length > 0 && (<>
+                                    <FileExplorer pr={0} isexpanded={true} filesSystem={filesSystem} onUpdate={fetchFilesDirectories} openFile={(item) => openFileInEditor(item)} />
+                                </>)}
+
+                                {filesSystem.length < 1 && (<>
+                                    <p>loading....</p>
+                                </>)}
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div
+                        ref={resizerRef}
+                        onMouseDown={handleMouseDown}
+                        style={{
+                            width: '5px',
+                            cursor: 'col-resize',
+                            backgroundColor: isDragging ? '#5183f5' : '#000',
+                            height: '100%',
+                            position: 'absolute',
+                            top: 0,
+                            right: 0
+                        }}
+                    />
+                </div>
+                <div className="flex-grow h-full">
+                    <div className="w-full h-full flex flex-col">
+                        <div style={{ backgroundColor: '#e5e5e5' }} className="w-full h-[10%] flex">
+
+                            <div style={{ cursor: 'pointer' }} onClick={() => setnavwidth(prevWidth => (prevWidth > '0' ? '0' : '240'))} className="w-[80px] h-full flex justify-center items-center">
+                                <GiHamburgerMenu size={25} />
+                            </div>
+
+                            <div className="flex-grow h-full">
+
+                                <div className="w-auto h-full px-[60px] float-right flex justify-center items-center">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline">
+                                                <FaUser className="mr-2 h-4 w-4" /> My Profile
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent className="w-56">
+                                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuGroup>
+                                                <DropdownMenuItem>
+                                                    <User className="mr-2 h-4 w-4" />
+                                                    <span>Profile</span>
+                                                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuGroup>
+                                            <DropdownMenuItem onClick={() => signOut()}>
+                                                <LogOut className="mr-2 h-4 w-4" />
+                                                <span>Log out</span>
+                                                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {
+                            openFiles.length > 0 && (<>
+                                <div style={{ backgroundColor: '#e5e5e5c7' }} className="w-full h-[5%]">
+                                    <div className="w-full h-full">
+
+                                        {
+                                            openFiles.map((openFile, index) => (
+                                                <>
+
+                                                    {
+                                                        openFile.isopen ? (
+                                                            <div key={index} style={{ backgroundColor: '#f5f5f5' }} className="w-[200px] h-full float-left border-r-2 border-white">
+                                                                <div className="w-full h-full grid grid-cols-12">
+                                                                    <div onClick={() => selectFile(openFile)} className="h-full col-span-10 px-[20px] flex justify-start items-center cursor-pointer">
+                                                                        <small className='font-semibold'>
+                                                                            {openFile.filename}
+                                                                        </small>
+                                                                    </div>
+                                                                    <div onClick={() => removeFile(openFile)} className="hover:bg-[#e5e5e5c7] h-full col-span-2 flex justify-center items-center cursor-pointer">
+                                                                        <small><FaTimes className='font-thin text-black' /></small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div key={index} className="w-[200px] h-full float-left border-r-2 border-white">
+                                                                <div className="w-full h-full grid grid-cols-12">
+                                                                    <div onClick={() => selectFile(openFile)} className="h-full col-span-10 px-[20px] flex justify-start items-center cursor-pointer">
+                                                                        <small className='font-semibold'>
+                                                                            {openFile.filename}
+                                                                        </small>
+                                                                    </div>
+                                                                    <div onClick={() => removeFile(openFile)} className="hover:bg-[#e5e5e5c7] h-full col-span-2 flex justify-center items-center cursor-pointer">
+                                                                        <small><FaTimes className='font-thin text-black' /></small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    }
+
+                                                </>
+                                            ))
+                                        }
+
+                                    </div>
+                                </div>
+
+
+                                <div style={{ backgroundColor: '#f5f5f5' }} className="w-full h-[85%]">
+                                    {/* <NoteEditor></NoteEditor> */}
+                                </div>
+                            </>)
+                        }
+
+
+                        {
+                            openFiles.length < 1 && (<>
+                                <div style={{ backgroundColor: '#f5f5f5' }} className="w-full h-[90%]">
+                                </div>
+                            </>)
+                        }
+
+
+                    </div>
+                </div>
+            </div >
+
+
+        </>
+    )
 }
 
 export default page

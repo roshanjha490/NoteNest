@@ -4248,7 +4248,7 @@ select {
 
 .CodeMirror {
   font-family: monospace;
-  height: 300px;
+  height: auto !important;
   color: #000;
   direction: ltr
 }
@@ -4257,11 +4257,13 @@ select {
   padding: 4px 0
 }
 
-.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like {
+.CodeMirror pre.CodeMirror-line,
+.CodeMirror pre.CodeMirror-line-like {
   padding: 0 4px
 }
 
-.CodeMirror-gutter-filler,.CodeMirror-scrollbar-filler {
+.CodeMirror-gutter-filler,
+.CodeMirror-scrollbar-filler {
   background-color: #fff
 }
 
@@ -4299,7 +4301,7 @@ select {
 
 .cm-fat-cursor .CodeMirror-cursor {
   width: auto;
-  border: 0!important;
+  border: 0 !important;
   background: #7e7
 }
 
@@ -4308,7 +4310,7 @@ select {
 }
 
 .cm-fat-cursor-mark {
-  background-color: rgba(20,255,20,.5);
+  background-color: rgba(20, 255, 20, .5);
   -webkit-animation: blink 1.06s steps(1) infinite;
   -moz-animation: blink 1.06s steps(1) infinite;
   animation: blink 1.06s steps(1) infinite
@@ -4325,19 +4327,19 @@ select {
 
 @-moz-keyframes blink {
   50% {
-      background-color: transparent
+    background-color: transparent
   }
 }
 
 @-webkit-keyframes blink {
   50% {
-      background-color: transparent
+    background-color: transparent
   }
 }
 
 @keyframes blink {
   50% {
-      background-color: transparent
+    background-color: transparent
   }
 }
 
@@ -4378,7 +4380,8 @@ select {
   color: #292
 }
 
-.cm-header,.cm-strong {
+.cm-header,
+.cm-strong {
   font-weight: 700
 }
 
@@ -4414,7 +4417,8 @@ select {
   color: #05a
 }
 
-.cm-s-default .cm-type,.cm-s-default .cm-variable-3 {
+.cm-s-default .cm-type,
+.cm-s-default .cm-variable-3 {
   color: #085
 }
 
@@ -4483,7 +4487,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
 }
 
 .CodeMirror-matchingtag {
-  background: rgba(255,150,0,.3)
+  background: rgba(255, 150, 0, .3)
 }
 
 .CodeMirror-activeline-background {
@@ -4497,7 +4501,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
 }
 
 .CodeMirror-scroll {
-  overflow: scroll!important;
+  overflow: scroll !important;
   margin-bottom: -50px;
   margin-right: -50px;
   padding-bottom: 50px;
@@ -4511,7 +4515,10 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   border-right: 50px solid transparent
 }
 
-.CodeMirror-gutter-filler,.CodeMirror-hscrollbar,.CodeMirror-scrollbar-filler,.CodeMirror-vscrollbar {
+.CodeMirror-gutter-filler,
+.CodeMirror-hscrollbar,
+.CodeMirror-scrollbar-filler,
+.CodeMirror-vscrollbar {
   position: absolute;
   z-index: 6;
   display: none;
@@ -4561,8 +4568,8 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
 .CodeMirror-gutter-wrapper {
   position: absolute;
   z-index: 4;
-  background: 0 0!important;
-  border: none!important
+  background: 0 0 !important;
+  border: none !important
 }
 
 .CodeMirror-gutter-background {
@@ -4591,7 +4598,8 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   min-height: 1px
 }
 
-.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like {
+.CodeMirror pre.CodeMirror-line,
+.CodeMirror pre.CodeMirror-line-like {
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
   border-radius: 0;
@@ -4612,7 +4620,8 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   font-variant-ligatures: contextual
 }
 
-.CodeMirror-wrap pre.CodeMirror-line,.CodeMirror-wrap pre.CodeMirror-line-like {
+.CodeMirror-wrap pre.CodeMirror-line,
+.CodeMirror-wrap pre.CodeMirror-line-like {
   word-wrap: break-word;
   white-space: pre-wrap;
   word-break: normal
@@ -4641,7 +4650,11 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {
   outline: 0
 }
 
-.CodeMirror-gutter,.CodeMirror-gutters,.CodeMirror-linenumber,.CodeMirror-scroll,.CodeMirror-sizer {
+.CodeMirror-gutter,
+.CodeMirror-gutters,
+.CodeMirror-linenumber,
+.CodeMirror-scroll,
+.CodeMirror-sizer {
   -moz-box-sizing: content-box;
   box-sizing: content-box
 }
@@ -4689,17 +4702,21 @@ div.CodeMirror-dragcursors {
   cursor: crosshair
 }
 
-.CodeMirror-line::selection,.CodeMirror-line>span::selection,.CodeMirror-line>span>span::selection {
+.CodeMirror-line::selection,
+.CodeMirror-line>span::selection,
+.CodeMirror-line>span>span::selection {
   background: #d7d4f0
 }
 
-.CodeMirror-line::-moz-selection,.CodeMirror-line>span::-moz-selection,.CodeMirror-line>span>span::-moz-selection {
+.CodeMirror-line::-moz-selection,
+.CodeMirror-line>span::-moz-selection,
+.CodeMirror-line>span>span::-moz-selection {
   background: #d7d4f0
 }
 
 .cm-searching {
   background-color: #ffa;
-  background-color: rgba(255,255,0,.4)
+  background-color: rgba(255, 255, 0, .4)
 }
 
 .cm-force-border {
@@ -4708,7 +4725,7 @@ div.CodeMirror-dragcursors {
 
 @media print {
   .CodeMirror div.CodeMirror-cursors {
-      visibility: hidden
+    visibility: hidden
   }
 }
 
@@ -4729,11 +4746,15 @@ span.CodeMirror-selectedtext {
   background: #e0e0e0
 }
 
-.cm-s-base16-light .CodeMirror-line::selection,.cm-s-base16-light .CodeMirror-line>span::selection,.cm-s-base16-light .CodeMirror-line>span>span::selection {
+.cm-s-base16-light .CodeMirror-line::selection,
+.cm-s-base16-light .CodeMirror-line>span::selection,
+.cm-s-base16-light .CodeMirror-line>span>span::selection {
   background: #e0e0e0
 }
 
-.cm-s-base16-light .CodeMirror-line::-moz-selection,.cm-s-base16-light .CodeMirror-line>span::-moz-selection,.cm-s-base16-light .CodeMirror-line>span>span::-moz-selection {
+.cm-s-base16-light .CodeMirror-line::-moz-selection,
+.cm-s-base16-light .CodeMirror-line>span::-moz-selection,
+.cm-s-base16-light .CodeMirror-line>span>span::-moz-selection {
   background: #e0e0e0
 }
 
@@ -4770,7 +4791,8 @@ span.CodeMirror-selectedtext {
   color: #aa759f
 }
 
-.cm-s-base16-light span.cm-attribute,.cm-s-base16-light span.cm-property {
+.cm-s-base16-light span.cm-attribute,
+.cm-s-base16-light span.cm-property {
   color: #90a959
 }
 
@@ -4816,15 +4838,15 @@ span.CodeMirror-selectedtext {
 }
 
 .cm-s-base16-light .CodeMirror-matchingbracket {
-  color: #f5f5f5!important;
-  background-color: #6a9fb5!important
+  color: #f5f5f5 !important;
+  background-color: #6a9fb5 !important
 }
 
 .CodeMirror {
   -webkit-font-smoothing: subpixel-antialiased;
   padding: 1rem;
   height: 100%;
-  font-family: Menlo,Monaco,monospace;
+  font-family: Menlo, Monaco, monospace;
   font-weight: 500;
   font-size: 15px;
   line-height: 1.5
@@ -4843,6 +4865,5 @@ span.CodeMirror-selectedtext {
 }
 
 .CodeMirror-activeline-background {
-  background: rgba(0,0,0,.05)!important
+  background: rgba(0, 0, 0, .05) !important
 }
-

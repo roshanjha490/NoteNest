@@ -4,8 +4,6 @@ import SessionWrapper from "../component/SessionWrapper";
 import { getServerSession } from "next-auth/next"
 import { redirect } from 'next/navigation'
 import { Toaster } from 'react-hot-toast';
-import NavBar from "./components/NavBar";
-
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,10 +20,7 @@ const NotesLayout = async ({ children }) => {
         return (
             <SessionWrapper>
 
-                <NavBar>
-                    {children}
-                </NavBar>
-
+                {children}
                 <Toaster position="top-center" />
 
             </SessionWrapper >
