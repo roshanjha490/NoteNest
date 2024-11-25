@@ -3,10 +3,10 @@ import React from 'react'
 
 import dynamic from 'next/dynamic';
 
-// import { Controlled as CodeMirror } from 'react-codemirror2';
+import { Controlled as CodeMirror } from 'react-codemirror2';
 
 // Dynamically import CodeMirror on the client side
-const CodeMirror = dynamic(() => import('react-codemirror2').then(mod => mod.Controlled), { ssr: false });
+// const CodeMirror = dynamic(() => import('react-codemirror2').then(mod => mod.Controlled), { ssr: false });
 
 // import 'codemirror/lib/codemirror.css';
 // // import 'codemirror/theme/material.css';
@@ -16,20 +16,23 @@ const CodeMirror = dynamic(() => import('react-codemirror2').then(mod => mod.Con
 // import 'codemirror/addon/scroll/scrollpastend'
 
 
-import { createFile, get_filecontent } from '@/app/actions';
-import { toast } from 'react-hot-toast';
+import { get_filecontent, saveFileContent } from '@/app/actions';
 
 import { useState, useRef, useEffect } from 'react'
+import { toast } from 'react-hot-toast';
 
 
-const NoteEditor = () => {
+const NoteEditor = ({ fileItem }) => {
 
-    const [value, setValue] = useState('<h1>I ♥ react-codemirror2</h1>');
+    const [value, setvalue] = useState()
     const editor = useRef()
     const wrapper = useRef()
 
     const editorWillUnmount = () => {
         editor.current.display.wrapper.remove()
+        // if (editor.current.setValue) {
+        //     editor.current.setValue(value)
+        // }
         // wrapper.current.hydrated = false
     }
 
@@ -51,25 +54,32 @@ const NoteEditor = () => {
     // }
 
 
-    // useEffect(() => {
+    const fetchNotes = async () => {
 
-    //     const fetchNotes = async () => {
+        const result = await get_filecontent(fileItem)
 
-    //         const result = await get_filecontent()
+        if (result.success) {
+            setvalue(result.response)
+        } else {
+            toast.error('Failed')
+        }
 
-    //         if (result.success) {
-    //             setValue(result.response)
-    //         } else {
-    //             toast.error('Failed')
-    //         }
+    }
 
-    //     }
+    useEffect(() => {
+        fetchNotes()
+    }, [])
 
-    //     fetchNotes()
+    const saveContentFromEditor = async (value) => {
 
-    // }, [])
+        const result = await saveFileContent(value, fileItem.filepath)
 
-
+        if (result.success) {
+            console.log(result.message)
+        } else {
+            toast.error(result.message)
+        }
+    }
 
     return (
         <>
@@ -106,9 +116,11 @@ const NoteEditor = () => {
                         }
                     }}
                     onBeforeChange={(editor, data, value) => {
-                        setValue(value);
+                        setvalue(value);
+                        saveContentFromEditor(value)
                     }}
                     onChange={(editor, data, value) => {
+                        // saveContentFromEditor(data, value)
                     }}
                     editorDidMount={(e) => editor.current = e}
                     editorWillUnmount={editorWillUnmount}

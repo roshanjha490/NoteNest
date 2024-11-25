@@ -8,7 +8,6 @@ const FileExplorer = ({ pr, filesSystem, isexpanded, onUpdate, openFile }) => {
     const [expanded, setExpanded] = useState({ 0: isexpanded })
 
     const toggleExpand = (index) => {
-        console.log(expanded)
         setExpanded(prev => ({ ...prev, [index]: !prev[index] }));
     };
 

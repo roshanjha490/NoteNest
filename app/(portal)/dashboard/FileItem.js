@@ -90,8 +90,12 @@ const FileItem = ({ pr, fileSystem, index, toggleExpand, expanded, onUpdate, ope
                                 <DropdownMenuItem onClick={() => openCreateModal(index + pr)}>Create New File</DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => openCreateFolderModal(index + pr)}>Create New Folder</DropdownMenuItem>
                                 <DropdownMenuItem>Upload File</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => openRenameModal(index + pr)}>Rename</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => openDeleteModal(index + pr)}>Delete</DropdownMenuItem>
+
+                                {(fileSystem.name === 'Research Study') ? (<></>) : (<>
+                                    <DropdownMenuItem onClick={() => openRenameModal(index + pr)}>Rename</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => openDeleteModal(index + pr)}>Delete</DropdownMenuItem>
+                                </>)}
+
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

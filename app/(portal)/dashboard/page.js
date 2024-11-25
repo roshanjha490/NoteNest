@@ -85,9 +85,42 @@ const page = ({ children }) => {
 
     const fetchFilesDirectories = async () => {
         const response = await get_all_files_n_directories();
-        console.log(openFiles)
+
         if (response.success) {
-            setfilesSystem(response.response);
+            const newFilesSystem = response.response;
+
+            if (openFiles.length > 0) {
+
+                // Extract all file paths from filesSystem
+                const extractFilePaths = (nodes) => {
+                    let paths = [];
+                    nodes.forEach(node => {
+                        if (node.isDirectory) {
+                            paths = paths.concat(extractFilePaths(node.children || []));
+                        } else {
+                            paths.push(node.path);
+                        }
+                    });
+                    return paths;
+                };
+
+                // Call extractFilePaths with the root directory objects
+                const filePathsInFilesSystem = extractFilePaths(newFilesSystem);
+
+                // // Filter openFiles to remove entries that no longer exist in filesSystem
+                const updatedOpenFiles = openFiles.filter(file => filePathsInFilesSystem.includes(file.filepath));
+
+                // Ensure at least one file has isopen set to true
+                const openFileExists = updatedOpenFiles.some(file => file.isopen);
+
+                if (!openFileExists && updatedOpenFiles.length > 0) {
+                    updatedOpenFiles[0].isopen = true; // Set the first file to open if none are open
+                }
+
+                setopenFiles(updatedOpenFiles);
+            }
+
+            setfilesSystem(newFilesSystem);
         } else {
             toast.error(response.message);
         }
@@ -119,8 +152,6 @@ const page = ({ children }) => {
                 );
             }
 
-            console.log('Updated Open Files:', updatedOpenFiles);
-
             // Return the updated array
             return updatedOpenFiles;
         });
@@ -134,6 +165,7 @@ const page = ({ children }) => {
     };
 
     const removeFile = (fileToRemove) => {
+
         const updatedFiles = openFiles.filter(file => file !== fileToRemove);
 
         // If the removed file was open, set the first file to be open
@@ -152,7 +184,7 @@ const page = ({ children }) => {
 
     return (
         <>
-            <div className="w-full h-screen flex">
+            <div className="w-screen h-screen flex">
                 <div style={{ width: navwidth + 'px', backgroundColor: '#2d2d2d', position: 'relative' }} className="h-full flex overflow-hidden">
 
                     <div className="w-[100%] h-full flex flex-col">
@@ -199,7 +231,8 @@ const page = ({ children }) => {
                         }}
                     />
                 </div>
-                <div className="flex-grow h-full">
+
+                <div style={{ width: `calc(100% - ${navwidth}px)` }} className="h-full">
                     <div className="w-full h-full flex flex-col">
                         <div style={{ backgroundColor: '#e5e5e5' }} className="w-full h-[10%] flex">
 
@@ -250,7 +283,7 @@ const page = ({ children }) => {
 
                                                     {
                                                         openFile.isopen ? (
-                                                            <div key={index} style={{ backgroundColor: '#f5f5f5' }} className="w-[200px] h-full float-left border-r-2 border-white">
+                                                            <div key={index} style={{ backgroundColor: '#f5f5f5' }} className="min-w-[200px] h-full float-left border-r-2 border-white">
                                                                 <div className="w-full h-full grid grid-cols-12">
                                                                     <div onClick={() => selectFile(openFile)} className="h-full col-span-10 px-[20px] flex justify-start items-center cursor-pointer">
                                                                         <small className='font-semibold'>
@@ -263,7 +296,7 @@ const page = ({ children }) => {
                                                                 </div>
                                                             </div>
                                                         ) : (
-                                                            <div key={index} className="w-[200px] h-full float-left border-r-2 border-white">
+                                                            <div key={index} className="min-w-[200px] h-full float-left border-r-2 border-white">
                                                                 <div className="w-full h-full grid grid-cols-12">
                                                                     <div onClick={() => selectFile(openFile)} className="h-full col-span-10 px-[20px] flex justify-start items-center cursor-pointer">
                                                                         <small className='font-semibold'>
@@ -287,7 +320,15 @@ const page = ({ children }) => {
 
 
                                 <div style={{ backgroundColor: '#f5f5f5' }} className="w-full h-[85%]">
-                                    {/* <NoteEditor></NoteEditor> */}
+
+                                    {
+                                        openFiles.map((openedFile, index) => (<>
+                                            {openedFile.isopen && (<>
+                                                <NoteEditor fileItem={openedFile}></NoteEditor>
+                                            </>)}
+                                        </>))
+                                    }
+
                                 </div>
                             </>)
                         }

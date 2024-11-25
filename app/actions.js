@@ -75,37 +75,56 @@ export async function get_userdata() {
 
 }
 
-export async function createFile(value) {
 
-    const directoryPath = path.join(process.cwd(), 'notes');
+export async function get_filecontent(fileItem) {
+    try {
+        // Extract the file path from the fileItem object
+        const filePath = fileItem.filepath;
 
-    const filePath = path.join(directoryPath, `${'research-page'}.md`);
+        // Check if the file path is provided
+        if (!filePath) {
+            throw new Error('File path is missing');
+        }
 
-    // Ensure the directory exists
-    await fs.mkdir(directoryPath, { recursive: true });
+        // Read the file content
+        const content = await fs.readFile(filePath, 'utf8');
 
-    // Write the file
-    await fs.writeFile(filePath, value);
-
-    return { success: true, message: 'File Created' }
+        // Return the file content
+        return {
+            success: true,
+            message: 'File content received',
+            response: content
+        };
+    } catch (error) {
+        // Handle errors and return a meaningful message
+        console.error('Error reading file content:', error);
+        return {
+            success: false,
+            message: error.message,
+            response: null
+        };
+    }
 
 }
 
-export async function get_filecontent() {
-    const filename = 'research-page'
+export async function saveFileContent(content, path) {
+    try {
+        // Write the content to the file
+        await fs.writeFile(path, content, 'utf8');
 
-    const folder = 'notes'
-
-    const filePath = path.join(process.cwd(), folder, `${filename}.md`);
-
-    const content = await fs.readFile(filePath, 'utf8');
-
-    return {
-        success: true,
-        message: 'File Content receieved',
-        response: content
+        // Return a success message
+        return {
+            success: true,
+            message: 'File content saved successfully',
+        };
+    } catch (error) {
+        // Handle errors and return a meaningful message
+        console.error('Error saving file content:', error);
+        return {
+            success: false,
+            message: error.message,
+        };
     }
-
 }
 
 async function getDirectoryContent(directoryPath) {
