@@ -6,6 +6,7 @@ import { createHash } from "crypto";
 import { promises as fs } from 'fs';
 import path from 'path';
 
+import simpleGit from 'simple-git';
 
 export async function checkLogin(formData) {
 
@@ -291,6 +292,36 @@ export async function create_new_folder(formData) {
         };
     }
 
+}
+
+export async function check_git_changes() {
+
+    const repopath = path.join(process.cwd(), 'Research Study')
+
+    const git = simpleGit(repopath)
+
+    const status = await git.status()
+
+    const hasChanges = status.not_added.length > 0 ||
+        status.modified.length > 0 ||
+        status.deleted.length > 0 ||
+        status.conflicted.length > 0 ||
+        status.created.length > 0;
+
+    return hasChanges
+}
+
+export async function performSyncChanges() {
+    const repoPath = path.join(process.cwd(), 'Research Study')
+
+    const git = simpleGit(repoPath);
+
+    // Add and commit changes
+    await git.add('./*'); // Stage all changes
+    await git.commit('Updated notes'); // Commit with a message
+    await git.push(); // Push to remote repository
+
+    return true
 }
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));

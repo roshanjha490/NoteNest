@@ -20,6 +20,7 @@ import Rename from './Rename';
 import Delete from './Delete';
 import CreateFile from './CreateFile';
 import CreateFolder from './CreateFolder';
+import UploadFile from './UploadFile';
 
 const FileItem = ({ pr, fileSystem, index, toggleExpand, expanded, onUpdate, openFile }) => {
 
@@ -60,6 +61,16 @@ const FileItem = ({ pr, fileSystem, index, toggleExpand, expanded, onUpdate, ope
         document.body.style.overflow = 'hidden';
     }
 
+    const [uploadFileModalIndex, setuploadFileModalIndex] = useState(null)
+    const [isuploadFileModalOpen, setisuploadFileModalOpen] = useState(false)
+
+
+    const openUploadModal = (id) => {
+        setisuploadFileModalOpen(true)
+        setuploadFileModalIndex(id)
+        document.body.style.overflow = 'hidden';
+    }
+
     return (
         <>
             <div key={index} className="main-folder w-full h-auto my-[5px]">
@@ -89,7 +100,7 @@ const FileItem = ({ pr, fileSystem, index, toggleExpand, expanded, onUpdate, ope
                             <DropdownMenuContent>
                                 <DropdownMenuItem onClick={() => openCreateModal(index + pr)}>Create New File</DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => openCreateFolderModal(index + pr)}>Create New Folder</DropdownMenuItem>
-                                <DropdownMenuItem>Upload File</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => openUploadModal(index + pr)}>Upload File</DropdownMenuItem>
 
                                 {(fileSystem.name === 'Research Study') ? (<></>) : (<>
                                     <DropdownMenuItem onClick={() => openRenameModal(index + pr)}>Rename</DropdownMenuItem>
@@ -154,6 +165,20 @@ const FileItem = ({ pr, fileSystem, index, toggleExpand, expanded, onUpdate, ope
                             }}
                             onUpdate={onUpdate}></CreateFolder>
                     )}
+
+
+                    {isuploadFileModalOpen && uploadFileModalIndex === index + pr && (<>
+                        <UploadFile
+                            FileItem={fileSystem}
+                            index={index + pr}
+                            onClose={() => {
+                                setisuploadFileModalOpen(false);
+                                setuploadFileModalIndex(null);
+                                document.body.style.overflow = '';
+                            }}
+                            onUpdate={onUpdate}
+                        ></UploadFile>
+                    </>)}
 
 
                 </>) : (<>

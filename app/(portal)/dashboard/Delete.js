@@ -48,31 +48,37 @@ const Delete = ({ FileItem, index, onClose, onUpdate }) => {
 
 
     return (
-        <div id={'crud_modal_' + index} tabindex="-1" aria-hidden="true" className={"overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-[999] flex justify-center items-center w-full h-full md:inset-0 min-h-full"} style={{ backgroundColor: '#0000008a' }}>
-            <div className="relative p-4 w-full max-w-md max-h-full">
-                <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <div tabindex="-1" aria-hidden="true" className={"overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-[999] flex justify-center items-center w-full h-full md:inset-0 min-h-full"}>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="p-4 md:p-5">
+            <div className="relative w-full h-full flex justify-center items-center">
+                <div className="relative p-4 w-full max-w-md max-h-full z-[990]">
+                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
 
-                        <input type="hidden" {...register("old_path_name")} value={FileItem.path} />
+                        <form onSubmit={handleSubmit(onSubmit)} className="p-4 md:p-5">
 
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            Are you absolutely sure?
-                        </h3>
+                            <input type="hidden" {...register("old_path_name")} value={FileItem.path} />
 
-                        <br />
-                        <p>This action cannot be undone. This will permanently delete your Folder and Subfolders.</p>
-                        <br />
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                Are you absolutely sure?
+                            </h3>
 
-                        <div className='w-full h-auto'>
-                            <Button className="mr-[10px]" type="submit">Continue</Button>
-                            <Button className="mr-[10px]" onClick={() => closeModal(index)} variant="outline">Cancel</Button>
-                        </div>
+                            <br />
+                            <p>This action cannot be undone. This will permanently delete your Folder and Subfolders.</p>
+                            <br />
 
-                    </form>
+                            <div className='w-full h-auto'>
+                                <Button className="mr-[10px]" type="submit">Continue</Button>
+                                <Button className="mr-[10px]" onClick={() => closeModal(index)} variant="outline">Cancel</Button>
+                            </div>
 
+                        </form>
+
+                    </div>
                 </div>
+
+                <div onClick={() => closeModal(index)} id={'crud_modal_' + index} className='w-full h-full fixed top-[0%] left-[0%] translate-[-50%] z-[920]' style={{ backgroundColor: '#0000008a' }}></div>
             </div>
+
         </div>
     )
 }

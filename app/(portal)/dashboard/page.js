@@ -42,14 +42,19 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-
+import { FaSync } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
+import { IoMdSettings } from "react-icons/io";
 
 import { get_all_files_n_directories } from '@/app/actions';
 import FileExplorer from './FileExplorer';
+import { check_git_changes } from '@/app/actions';
+import { performSyncChanges } from '@/app/actions';
 
 import Rename from './Rename';
 import NoteEditor from './NoteEditor';
+import { IoMdCheckmark } from "react-icons/io";
+
 
 const page = ({ children }) => {
 
@@ -181,6 +186,54 @@ const page = ({ children }) => {
 
         setopenFiles(finalFiles);
     };
+
+    const [currentTime, setCurrentTime] = useState("");
+
+    useEffect(() => {
+        const updateDateTime = () => {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+            const amPm = hours >= 12 ? "PM" : "AM";
+            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes; // Pad minutes with leading zero
+            const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+            setCurrentTime(`${formattedHours}:${formattedMinutes} ${amPm} on ${formattedDate}`);
+        };
+
+        updateDateTime(); // Update initially
+        const intervalId = setInterval(updateDateTime, 60000); // Update every minute
+
+        return () => clearInterval(intervalId); // Cleanup on component unmount
+    }, []);
+
+
+    const [sync, setsync] = useState(null)
+
+    const fetchStatus = async () => {
+        const response = await check_git_changes()
+
+        setsync(response)
+
+        console.log(response)
+    }
+
+    useEffect(() => {
+        const check_interval = setInterval(fetchStatus, 5000)
+
+        return () => clearInterval(check_interval)
+    }, [])
+
+
+    const syncChanges = async () => {
+        setsync(null)
+
+        const response = await performSyncChanges()
+
+        if (response) {
+            setsync(false)
+        }
+    }
 
     return (
         <>
@@ -319,7 +372,7 @@ const page = ({ children }) => {
                                 </div>
 
 
-                                <div style={{ backgroundColor: '#f5f5f5' }} className="w-full h-[85%]">
+                                <div style={{ backgroundColor: '#f5f5f5' }} className="w-full h-[80%]">
 
                                     {
                                         openFiles.map((openedFile, index) => (<>
@@ -330,13 +383,86 @@ const page = ({ children }) => {
                                     }
 
                                 </div>
+
+
+                                <div style={{ backgroundColor: '#e5e5e5' }} className="w-full h-[5%]">
+                                    <div className="w-full h-full flex justify-end items-center">
+                                        <div className="w-auto h-full">
+
+                                            <div className="w-auto h-full flex justify-center items-center float-left px-[10px]">
+                                                <small>{currentTime}</small>
+                                            </div>
+
+                                            {
+                                                sync != null ? (<>
+                                                    {
+                                                        sync ? (<>
+                                                            <div onClick={() => syncChanges()} className="w-auto h-full flex justify-center items-center float-left px-[10px] hover:bg-[#00000021] cursor-pointer">
+                                                                <FaSync />
+                                                            </div>
+                                                        </>) : (<>
+                                                            <div className="w-auto h-full flex justify-center items-center float-left px-[10px] hover:bg-[#00000021] cursor-pointer">
+                                                                <IoMdCheckmark />
+                                                            </div>
+                                                        </>)
+                                                    }
+                                                </>) : (<>
+                                                    <div className="w-auto h-full flex justify-center items-center float-left px-[10px] hover:bg-[#00000021] cursor-pointer">
+                                                        <small className=''> Loading ... </small>
+                                                    </div>
+                                                </>)
+                                            }
+
+                                            <div className="w-auto h-full flex justify-center items-center float-left px-[10px] hover:bg-[#00000021] cursor-pointer">
+                                                <IoMdSettings className='text-xl' />
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
                             </>)
                         }
 
 
                         {
                             openFiles.length < 1 && (<>
-                                <div style={{ backgroundColor: '#f5f5f5' }} className="w-full h-[90%]">
+                                <div style={{ backgroundColor: '#f5f5f5' }} className="w-full h-[85%]">
+                                </div>
+
+                                <div style={{ backgroundColor: '#e5e5e5' }} className="w-full h-[5%]">
+                                    <div className="w-full h-full flex justify-end items-center">
+                                        <div className="w-auto h-full">
+
+                                            <div className="w-auto h-full flex justify-center items-center float-left px-[10px]">
+                                                <small>{currentTime}</small>
+                                            </div>
+
+                                            {
+                                                sync != null ? (<>
+                                                    {
+                                                        sync ? (<>
+                                                            <div onClick={() => syncChanges()} className="w-auto h-full flex justify-center items-center float-left px-[10px] hover:bg-[#00000021] cursor-pointer">
+                                                                <FaSync />
+                                                            </div>
+                                                        </>) : (<>
+                                                            <div className="w-auto h-full flex justify-center items-center float-left px-[10px] hover:bg-[#00000021] cursor-pointer">
+                                                                <IoMdCheckmark />
+                                                            </div>
+                                                        </>)
+                                                    }
+                                                </>) : (<>
+                                                    <div className="w-auto h-full flex justify-center items-center float-left px-[10px] hover:bg-[#00000021] cursor-pointer">
+                                                        <small className=''> Loading ... </small>
+                                                    </div>
+                                                </>)
+                                            }
+
+                                            <div className="w-auto h-full flex justify-center items-center float-left px-[10px] hover:bg-[#00000021] cursor-pointer">
+                                                <IoMdSettings className='text-xl' />
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </div>
                             </>)
                         }

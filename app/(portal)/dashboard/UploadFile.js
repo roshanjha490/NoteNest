@@ -1,29 +1,45 @@
 "use client"
 import React from 'react'
 import { FaTimes } from "react-icons/fa";
-import { z } from 'zod'
+
+import { Button } from "@/components/ui/button"
+
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast';
-import { Button } from "@/components/ui/button"
-import { create_new_folder } from '@/app/actions';
 
-const CreateFolder = ({ FileItem, index, onClose, onUpdate }) => {
+
+const UploadFile = ({ FileItem, index, onClose, onUpdate }) => {
 
     const closeModal = () => {
         onClose();
     }
 
-    let CreateFolderFormSchema = z.object({
+
+    const checkFileType = (file) => {
+        return file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'; // MIME type for .xlsx
+    };
+
+
+    let UploadFileSchema = z.object({
         old_path_name: z.string({
             required_error: "Old Path name is required",
             invalid_type_error: "Old Path name must be a string",
         }),
-        name: z.string({
-            required_error: "New Path name is required",
-            invalid_type_error: "New Path name must be a string",
-        })
+        // file_upload: z
+        //     .any()
+        //     .refine((file_upload) => file_upload instanceof File && file_upload.size > 0, {
+        //         message: 'File is required',
+        //     })
+        //     .refine(checkFileType, {
+        //         message: 'Only .xlsx file is supported',
+        //     }),
     });
+
 
     const {
         register,
@@ -31,25 +47,14 @@ const CreateFolder = ({ FileItem, index, onClose, onUpdate }) => {
         formState: { errors, isSubmitting },
         reset,
     } = useForm({
-        resolver: zodResolver(CreateFolderFormSchema),
+        resolver: zodResolver(UploadFileSchema),
     });
 
+
     async function onSubmit(formData) {
-        toast.remove();
-
-        const result = await create_new_folder(formData)
-
-        if (result.success) {
-            reset()
-            onClose()
-            onUpdate()
-            toast.success(result.message)
-        } else {
-            toast.error(result.message)
-        }
-
+        console.log(formData)
+        return
     }
-
 
     return (
         <div tabindex="-1" aria-hidden="true" className={"overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-[999] flex justify-center items-center w-full h-full md:inset-0 min-h-full"}>
@@ -59,7 +64,7 @@ const CreateFolder = ({ FileItem, index, onClose, onUpdate }) => {
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Create New Folder
+                                Upload File
                             </h3>
                             <button onClick={() => closeModal(index)} type="button" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
                                 <FaTimes className='w-[10px] h-[10px] text-black' />
@@ -73,11 +78,11 @@ const CreateFolder = ({ FileItem, index, onClose, onUpdate }) => {
 
                             <div className="grid gap-4 mb-[30px] grid-cols-1">
                                 <div className="col-span-2 sm:col-span-1">
-                                    <label for="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-                                    <input type="text" {...register("name")} id="name" className="m-[0px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder='Enter File Name eg: index.js' />
-                                    {errors.name && (
+                                    <Label htmlFor="picture">Upload File/Folder</Label>
+                                    <Input {...register("file_upload")} id="picture" type="file" name="file"  multiple={false} />
+                                    {errors.file_upload && (
                                         <>
-                                            <small className="text-red-500">{`${errors.name.message}`}</small>
+                                            <small className="text-red-500">{`${errors.file_upload.message}`}</small>
                                             <br />
                                         </>
                                     )}
@@ -100,4 +105,4 @@ const CreateFolder = ({ FileItem, index, onClose, onUpdate }) => {
     )
 }
 
-export default CreateFolder
+export default UploadFile
