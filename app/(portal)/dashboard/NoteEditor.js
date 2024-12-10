@@ -22,6 +22,8 @@ import { useState, useRef, useEffect } from 'react'
 import { toast } from 'react-hot-toast';
 
 
+import hotkeys from 'hotkeys-js';
+
 const NoteEditor = ({ fileItem }) => {
 
     const [value, setvalue] = useState()
@@ -45,6 +47,7 @@ const NoteEditor = ({ fileItem }) => {
             require('codemirror/addon/selection/active-line');
             require('codemirror/addon/scroll/scrollpastend');
         }
+
     }, []);
 
     // const onNewLine = (e) => {
@@ -112,7 +115,10 @@ const NoteEditor = ({ fileItem }) => {
                                     cm.execCommand("insertSoftTab");
                                 }
                             },
-                            "Enter": "newlineAndIndentContinueMarkdownList"
+                            "Enter": "newlineAndIndentContinueMarkdownList",
+                            "Ctrl-S": (cm) =>{
+                                console.log("lklkl")
+                            }
                         }
                     }}
                     onBeforeChange={(editor, data, value) => {

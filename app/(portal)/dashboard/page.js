@@ -56,6 +56,8 @@ import NoteEditor from './NoteEditor';
 import { IoMdCheckmark } from "react-icons/io";
 
 
+import hotkeys from 'hotkeys-js';
+
 const page = ({ children }) => {
 
     const [navwidth, setnavwidth] = useState('240')
@@ -235,6 +237,13 @@ const page = ({ children }) => {
         }
     }
 
+
+    hotkeys('ctrl+s', function (event, handler) {
+        // Prevent the default refresh event under WINDOWS system
+        event.preventDefault()
+    });
+
+
     return (
         <>
             <div className="w-screen h-screen flex">
@@ -254,8 +263,8 @@ const page = ({ children }) => {
                         </div>
 
 
-                        <div className="w-full flex-grow px-[5px] py-[10px]">
-                            <div className="w-full h-full">
+                        <div className="w-full flex-grow px-[5px] py-[10px] overflow-y-scroll file_list">
+                            <div className="w-full min-h-full">
 
                                 {filesSystem.length > 0 && (<>
                                     <FileExplorer pr={0} isexpanded={true} filesSystem={filesSystem} onUpdate={fetchFilesDirectories} openFile={(item) => openFileInEditor(item)} />

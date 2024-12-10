@@ -90,6 +90,19 @@ body {
     'Segoe UI Emoji';
 }
 
+
+/* Hide scrollbar in Chrome, Safari and Opera */
+.file_list::-webkit-scrollbar {
+  width: 0 !important;
+  display:none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.file_list {
+ -ms-overflow-style: none; /* IE and EDGE */;
+  scrollbar-width: none; /* Firefox */
+}
+
 /*
   Grouping content
   ================
