@@ -30,14 +30,49 @@ const UploadFile = ({ FileItem, index, onClose, onUpdate }) => {
             required_error: "Old Path name is required",
             invalid_type_error: "Old Path name must be a string",
         }),
-        // file_upload: z
-        //     .any()
-        //     .refine((file_upload) => file_upload instanceof File && file_upload.size > 0, {
-        //         message: 'File is required',
-        //     })
-        //     .refine(checkFileType, {
-        //         message: 'Only .xlsx file is supported',
-        //     }),
+        file_upload: z
+            .custom()
+            .superRefine((val, ctx) => {
+
+                if (val.length < 1) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.too_big,
+                        maximum: 3,
+                        type: "array",
+                        inclusive: true,
+                        message: "Kindly Select any File 😡",
+                    });
+                }
+
+                for (let i = 0; i < val.length; i++) {
+                    const file = val[i];
+
+                    const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+                    const maxSizeInBytes = 5 * 1048576;
+
+                    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.too_big,
+                            maximum: 3,
+                            type: "array",
+                            inclusive: true,
+                            message: "File Type not supported😡",
+                        });
+                    }
+
+                    if (file.size > maxSizeInBytes) {
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.too_big,
+                            maximum: 3,
+                            type: "array",
+                            inclusive: true,
+                            message: "File size too high",
+                        });
+                    }
+                }
+
+            })
     });
 
 
@@ -53,6 +88,7 @@ const UploadFile = ({ FileItem, index, onClose, onUpdate }) => {
 
     async function onSubmit(formData) {
         console.log(formData)
+        console.log('came here')
         return
     }
 
@@ -79,7 +115,7 @@ const UploadFile = ({ FileItem, index, onClose, onUpdate }) => {
                             <div className="grid gap-4 mb-[30px] grid-cols-1">
                                 <div className="col-span-2 sm:col-span-1">
                                     <Label htmlFor="picture">Upload File/Folder</Label>
-                                    <Input {...register("file_upload")} id="picture" type="file" name="file"  multiple={false} />
+                                    <Input {...register("file_upload")} id="picture" type="file" multiple={true} />
                                     {errors.file_upload && (
                                         <>
                                             <small className="text-red-500">{`${errors.file_upload.message}`}</small>

@@ -332,3 +332,14 @@ function sha256Hash(data) {
     hash.update(data);
     return hash.digest('hex');
 }
+
+
+export async function action(formData) {
+    const file = formData.get("file")
+
+    console.log(file)
+
+    // const data = await file.arrayBuffer()
+
+    // await fs.writeFile(`${process.cmd()}/tmp/${file.name}`, Buffer.from(data))
+}
