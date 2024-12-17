@@ -334,12 +334,49 @@ function sha256Hash(data) {
 }
 
 
-export async function action(formData) {
-    const file = formData.get("file")
+export async function upload_files({ old_path_name, files }) {
 
-    console.log(file)
+    try {
 
-    // const data = await file.arrayBuffer()
+        for (const fileData of files) {
 
-    // await fs.writeFile(`${process.cmd()}/tmp/${file.name}`, Buffer.from(data))
+            // Split the base64 data to separate metadata from content
+            const [meta, base64Content] = fileData.content.split(',');
+            // const [name, base64Content] = fileData.split(',');
+
+            // Extract the file extension/type from metadata (if available)
+            const match = meta.match(/data:(.*?);base64/);
+            const mimeType = match ? match[1] : null;
+
+
+            // // Generate a unique file name using current timestamp
+            const fileName = `${fileData.name}.${mimeType?.split('/')[1] || 'bin'}`;
+
+            // Create the full path for the file
+            const filePath = path.join(old_path_name, fileName);
+
+            // Decode the base64 content to binary data
+            const fileContent = Buffer.from(base64Content, 'base64');
+
+            // Save the file
+            await fs.writeFile(filePath, fileContent);
+
+            console.log(`File saved at: ${filePath}`);
+        }
+
+        return {
+            success: true,
+            message: 'Files uploaded successfully'
+        };
+
+    } catch (error) {
+        console.error('Error uploading files:', error);
+
+        return {
+            success: false,
+            message: 'Error uploading files',
+            error: error.message
+        };
+    }
+
 }

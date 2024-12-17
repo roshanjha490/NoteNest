@@ -11,19 +11,15 @@ import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast';
+import { upload_files } from '@/app/actions';
 
+import { fileToBase64 } from '@/lib/common-helper'
 
 const UploadFile = ({ FileItem, index, onClose, onUpdate }) => {
 
     const closeModal = () => {
         onClose();
     }
-
-
-    const checkFileType = (file) => {
-        return file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'; // MIME type for .xlsx
-    };
-
 
     let UploadFileSchema = z.object({
         old_path_name: z.string({
@@ -47,7 +43,7 @@ const UploadFile = ({ FileItem, index, onClose, onUpdate }) => {
                 for (let i = 0; i < val.length; i++) {
                     const file = val[i];
 
-                    const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+                    const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf"];
 
                     const maxSizeInBytes = 5 * 1048576;
 
@@ -86,10 +82,28 @@ const UploadFile = ({ FileItem, index, onClose, onUpdate }) => {
     });
 
 
-    async function onSubmit(formData) {
-        console.log(formData)
-        console.log('came here')
-        return
+    async function onSubmit(data) {
+
+        toast.remove();
+
+        const filesBase64 = await Promise.all(
+            Array.from(data.file_upload).map(async (file) => ({ name: file.name, content: await fileToBase64(file) }))
+        );
+
+        const result = await upload_files({
+            old_path_name: data.old_path_name,
+            files: filesBase64, // Array of base64-encoded files
+        });
+
+        if (result.success) {
+            reset()
+            onClose()
+            onUpdate()
+            toast.success(result.message)
+        } else {
+            toast.error(result.message)
+        }
+
     }
 
     return (
