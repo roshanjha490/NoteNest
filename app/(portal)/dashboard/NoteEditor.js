@@ -15,6 +15,12 @@ import { Controlled as CodeMirror } from 'react-codemirror2';
 // import 'codemirror/addon/selection/active-line'
 // import 'codemirror/addon/scroll/scrollpastend'
 
+// import "codemirror/mode/javascript/javascript";
+import "codemirror/addon/fold/foldcode";
+import "codemirror/addon/fold/foldgutter";
+import "codemirror/addon/fold/brace-fold";
+// import "codemirror/lib/codemirror.css";
+// import "codemirror/addon/fold/foldgutter.css";
 
 import { get_filecontent, saveFileContent } from '@/app/actions';
 
@@ -46,6 +52,7 @@ const NoteEditor = ({ fileItem }) => {
             require('codemirror/mode/gfm/gfm.js');
             require('codemirror/addon/selection/active-line');
             require('codemirror/addon/scroll/scrollpastend');
+            require('codemirror/addon/fold/foldgutter.css');
         }
 
     }, []);
@@ -107,6 +114,8 @@ const NoteEditor = ({ fileItem }) => {
                         viewportMargin: null,
                         indentWithTabs: true,
                         indentUnit: 10,
+                        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                        foldGutter: true,
                         extraKeys: {
                             "Tab": (cm) => {
                                 if (cm.somethingSelected()) {
@@ -116,9 +125,10 @@ const NoteEditor = ({ fileItem }) => {
                                 }
                             },
                             "Enter": "newlineAndIndentContinueMarkdownList",
-                            "Ctrl-S": (cm) =>{
+                            "Ctrl-S": (cm) => {
                                 console.log("lklkl")
-                            }
+                            },
+                            "Ctrl-Q": function (cm) { cm.foldCode(cm.getCursor()); }
                         }
                     }}
                     onBeforeChange={(editor, data, value) => {
